@@ -1,13 +1,6 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { ProcessPaymentUseCase, ProcessPaymentCommand } from '../../application/use-cases/process-payment.use-case';
-
-export class ProcessPaymentDto {
-  productId: string;
-  amount: number;
-  customerEmail: string;
-  creditCardToken: string;
-  installments: number;
-}
+import { Controller, Post, Body, HttpCode, HttpStatus, BadRequestException } from '@nestjs/common';
+import { ProcessPaymentUseCase } from '../../application/use-cases/process-payment.use-case';
+import { ProcessPaymentDto } from '../dtos/process-payment.dto';
 
 @Controller('payments')
 export class PaymentController {
@@ -16,21 +9,25 @@ export class PaymentController {
   @Post()
   @HttpCode(HttpStatus.OK)
   async processPayment(@Body() dto: ProcessPaymentDto) {
-    const transaction = await this.processPaymentUseCase.execute({
-      productId: dto.productId,
-      amount: dto.amount,
-      customerEmail: dto.customerEmail,
-      creditCardToken: dto.creditCardToken,
-      installments: dto.installments,
-    });
+    try {
+      const transaction = await this.processPaymentUseCase.execute({
+        productId: dto.productId,
+        amount: dto.amount,
+        customerEmail: dto.customerEmail,
+        creditCardToken: dto.creditCardToken,
+        installments: dto.installments,
+      });
 
-    return {
-      success: transaction.status === 'COMPLETED',
-      transaction: {
-        id: transaction.id,
-        reference: transaction.reference,
-        status: transaction.status,
-      }
-    };
+      return {
+        success: transaction.status === 'COMPLETED',
+        transaction: {
+          id: transaction.id,
+          reference: transaction.reference,
+          status: transaction.status,
+        }
+      };
+    } catch (error: any) {
+      throw new BadRequestException(error.message);
+    }
   }
 }

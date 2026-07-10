@@ -4,23 +4,20 @@ import { PRODUCT_REPOSITORY } from '../../domain/ports/product.repository';
 import type { ProductRepository } from '../../domain/ports/product.repository';
 import { TRANSACTION_REPOSITORY } from '../../domain/ports/transaction.repository';
 import type { TransactionRepository } from '../../domain/ports/transaction.repository';
+import { TRANSACTION_LOG_REPOSITORY } from '../../domain/ports/transaction-log.repository';
+import type { TransactionLogRepository } from '../../domain/ports/transaction-log.repository';
 import { PAYMENT_GATEWAY } from '../../domain/ports/payment-gateway.port';
 import type { PaymentGatewayPort } from '../../domain/ports/payment-gateway.port';
+import { ProcessPaymentCommand } from '../interfaces/process-payment.command';
+import { TransactionLog } from '../../domain/models/transaction-log.model';
 import { v4 as uuidv4 } from 'uuid';
-
-export interface ProcessPaymentCommand {
-  productId: string;
-  amount: number;
-  customerEmail: string;
-  creditCardToken: string;
-  installments: number;
-}
 
 @Injectable()
 export class ProcessPaymentUseCase {
   constructor(
     @Inject(PRODUCT_REPOSITORY) private readonly productRepository: ProductRepository,
     @Inject(TRANSACTION_REPOSITORY) private readonly transactionRepository: TransactionRepository,
+    @Inject(TRANSACTION_LOG_REPOSITORY) private readonly transactionLogRepository: TransactionLogRepository,
     @Inject(PAYMENT_GATEWAY) private readonly paymentGateway: PaymentGatewayPort,
   ) {}
 
@@ -33,6 +30,10 @@ export class ProcessPaymentUseCase {
 
     if (!product.hasSufficientStock()) {
       throw new Error('Product is out of stock');
+    }
+
+    if (product.price !== command.amount) {
+      throw new Error('Payment amount does not match product price');
     }
 
     // 2. Create Transaction in PENDING state
@@ -48,6 +49,9 @@ export class ProcessPaymentUseCase {
       command.customerEmail,
     );
     await this.transactionRepository.save(transaction);
+    await this.transactionLogRepository.save(
+      new TransactionLog(uuidv4(), transactionId, TransactionStatus.PENDING, new Date(), 'Transaction created')
+    );
 
     try {
       // 3. Call Wompi Payment API via Port
@@ -64,13 +68,22 @@ export class ProcessPaymentUseCase {
         transaction.markAsCompleted();
         product.decreaseStock();
         await this.productRepository.save(product); // Update stock in DB
+        await this.transactionLogRepository.save(
+          new TransactionLog(uuidv4(), transactionId, TransactionStatus.COMPLETED, new Date(), 'Payment approved by Wompi')
+        );
       } else {
         transaction.markAsFailed();
+        await this.transactionLogRepository.save(
+          new TransactionLog(uuidv4(), transactionId, TransactionStatus.FAILED, new Date(), `Payment rejected: ${response.error}`)
+        );
       }
 
     } catch (error) {
       // In case of a network or unexpected error, mark as failed
       transaction.markAsFailed();
+      await this.transactionLogRepository.save(
+        new TransactionLog(uuidv4(), transactionId, TransactionStatus.FAILED, new Date(), 'System error during payment')
+      );
     }
 
     // Save final transaction state
