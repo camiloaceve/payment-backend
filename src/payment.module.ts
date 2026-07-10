@@ -21,9 +21,12 @@ import { MysqlProductRepository } from './infrastructure/adapters/persistence/my
 import { MysqlTransactionRepository } from './infrastructure/adapters/persistence/mysql-transaction.repository';
 import { WompiSandboxPaymentGateway } from './infrastructure/adapters/external/wompi-sandbox-payment.gateway';
 
+import { HttpModule } from '@nestjs/axios';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([ProductEntity, TransactionEntity]),
+    HttpModule,
   ],
   controllers: [PaymentController],
   providers: [
