@@ -1,14 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { PaymentGatewayPort, PaymentGatewayRequest, PaymentGatewayResponse } from '../../../domain/ports/payment-gateway.port';
 
 @Injectable()
 export class WompiSandboxPaymentGateway implements PaymentGatewayPort {
-  private readonly apiUrl = 'https://api-sandbox.co.uat.wompi.dev/v1';
-  private readonly publicKey = 'pub_stagtest_g2u0HQd3ZMh05hsSgTS2lUV8t3s4mOt7';
+  private readonly apiUrl: string;
+  private readonly publicKey: string;
   
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {
+    this.apiUrl = this.configService.get<string>('WOMPI_API_URL') || 'https://api-sandbox.co.uat.wompi.dev/v1';
+    this.publicKey = this.configService.get<string>('WOMPI_PUBLIC_KEY') || '';
+  }
 
   async processPayment(request: PaymentGatewayRequest): Promise<PaymentGatewayResponse> {
     console.log(`[Wompi Sandbox] Sending real payment request for ${request.reference}...`);
