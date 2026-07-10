@@ -15,14 +15,22 @@ export class WompiSandboxPaymentGateway implements PaymentGatewayPort {
   ) {
     this.apiUrl = this.configService.get<string>('WOMPI_API_URL') || 'https://api-sandbox.co.uat.wompi.dev/v1';
     this.publicKey = this.configService.get<string>('WOMPI_PUBLIC_KEY') || '';
+    this.privateKey = this.configService.get<string>('WOMPI_PRIVATE_KEY') || '';
   }
 
   async processPayment(request: PaymentGatewayRequest): Promise<PaymentGatewayResponse> {
-    console.log(`[Wompi Sandbox] Sending real payment request for ${request.reference}...`);
-    
     try {
+      // 1. Get Merchant Acceptance Tokens (Required by Wompi Colombia)
+      const merchantResponse = await firstValueFrom(
+        this.httpService.get(`${this.apiUrl}/merchants/${this.publicKey}`)
+      );
+      
+      const acceptanceToken = merchantResponse.data.data.presigned_acceptance.acceptance_token;
+      const personalAuthToken = merchantResponse.data.data.presigned_personal_data_auth.acceptance_token;
+
+      // 2. Prepare payload exactly as Wompi Sandbox expects it
       const payload = {
-        amount_in_cents: request.amount * 100, // Wompi requires cents
+        amount_in_cents: request.amount * 100, // Wompi expects cents
         currency: 'COP',
         customer_email: request.customerEmail,
         payment_method: {
@@ -31,29 +39,24 @@ export class WompiSandboxPaymentGateway implements PaymentGatewayPort {
           installments: request.installments,
         },
         reference: request.reference,
+        acceptance_token: acceptanceToken,
+        accept_personal_auth: personalAuthToken,
       };
 
+      console.log(`[Wompi Sandbox] Sending real payment request for ${request.reference}...`);
+      
+      // 3. Send transaction
       const response = await firstValueFrom(
         this.httpService.post(`${this.apiUrl}/transactions`, payload, {
           headers: {
-            Authorization: `Bearer ${this.publicKey}`,
-          }
-        })
+            Authorization: `Bearer ${this.privateKey}`,
+          },
+        }),
       );
 
-      const data = response.data?.data;
-      
-      // Statuses in Wompi: APPROVED, DECLINED, ERROR...
-      if (data?.status === 'APPROVED') {
-        return {
-          success: true,
-          transactionId: data.id,
-        };
-      }
-
       return {
-        success: false,
-        error: `Transaction not approved. Status: ${data?.status}`,
+        success: response.data.data.status === 'APPROVED',
+        transactionId: response.data.data.id,
       };
 
     } catch (error: any) {
