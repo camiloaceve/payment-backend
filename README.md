@@ -40,8 +40,8 @@ DB_PASSWORD=
 DB_NAME=payments_db
 
 WOMPI_API_URL=https://sandbox.wompi.co/v1
-WOMPI_PUBLIC_KEY=pub_stagtest_g2u0HQd3ZMh05hsSgTS2lUV8t3s4mOt7
-WOMPI_PRIVATE_KEY=prv_stagtest_m9EQyjE4mHqjEONP1zJm4jB9OchNchWz
+WOMPI_PUBLIC_KEY=
+WOMPI_PRIVATE_KEY=
 ```
 
 ### 3. Installation
@@ -73,7 +73,6 @@ npm run test
 # Run tests and generate coverage report
 npm run test:cov
 ```
-*Note: We achieved > 80% coverage in the core Application Use Cases and Domain models.*
 
 ## 🐳 Docker (Deployment)
 To build and run the application using Docker:
