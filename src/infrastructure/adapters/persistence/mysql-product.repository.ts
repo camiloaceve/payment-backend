@@ -28,4 +28,9 @@ export class MysqlProductRepository implements ProductRepository {
 
     await this.repository.save(entity);
   }
+
+  async findAll(): Promise<Product[]> {
+    const entities = await this.repository.find();
+    return entities.map(entity => new Product(entity.id, entity.name, Number(entity.price), entity.stock));
+  }
 }

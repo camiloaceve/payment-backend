@@ -7,9 +7,11 @@ import { TransactionEntity } from './infrastructure/database/entities/transactio
 
 // Controllers
 import { PaymentController } from './infrastructure/controllers/payment.controller';
+import { ProductController } from './infrastructure/controllers/product.controller';
 
 // Use Cases
 import { ProcessPaymentUseCase } from './application/use-cases/process-payment.use-case';
+import { GetProductsUseCase } from './application/use-cases/get-products.use-case';
 
 // Ports (Tokens)
 import { PRODUCT_REPOSITORY } from './domain/ports/product.repository';
@@ -28,9 +30,10 @@ import { HttpModule } from '@nestjs/axios';
     TypeOrmModule.forFeature([ProductEntity, TransactionEntity]),
     HttpModule,
   ],
-  controllers: [PaymentController],
+  controllers: [PaymentController, ProductController],
   providers: [
     ProcessPaymentUseCase,
+    GetProductsUseCase,
     {
       provide: PRODUCT_REPOSITORY,
       useClass: MysqlProductRepository,
