@@ -16,7 +16,7 @@ import { PaymentModule } from './payment.module';
       password: process.env.DB_PASSWORD || 'root',
       database: process.env.DB_NAME || 'wompi_test',
       autoLoadEntities: true,
-      synchronize: true, // Only for development/testing
+      synchronize: false, // Turned off since we use init.sql
     }),
     PaymentModule,
   ],

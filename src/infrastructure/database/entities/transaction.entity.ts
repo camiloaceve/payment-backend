@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity('transactions')
 export class TransactionEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn({ type: 'varchar', length: 36 })
   id: string;
 
   @Column({ unique: true })
@@ -14,7 +14,7 @@ export class TransactionEntity {
   @Column()
   status: string;
 
-  @Column('uuid')
+  @Column({ type: 'varchar', length: 36 })
   productId: string;
 
   @Column()

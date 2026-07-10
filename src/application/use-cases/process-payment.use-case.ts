@@ -1,8 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Transaction, TransactionStatus } from '../../domain/models/transaction.model';
-import { ProductRepository, PRODUCT_REPOSITORY } from '../../domain/ports/product.repository';
-import { TransactionRepository, TRANSACTION_REPOSITORY } from '../../domain/ports/transaction.repository';
-import { PaymentGatewayPort, PAYMENT_GATEWAY } from '../../domain/ports/payment-gateway.port';
+import { PRODUCT_REPOSITORY } from '../../domain/ports/product.repository';
+import type { ProductRepository } from '../../domain/ports/product.repository';
+import { TRANSACTION_REPOSITORY } from '../../domain/ports/transaction.repository';
+import type { TransactionRepository } from '../../domain/ports/transaction.repository';
+import { PAYMENT_GATEWAY } from '../../domain/ports/payment-gateway.port';
+import type { PaymentGatewayPort } from '../../domain/ports/payment-gateway.port';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface ProcessPaymentCommand {

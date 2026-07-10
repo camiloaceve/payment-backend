@@ -1,5 +1,5 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { ProcessPaymentUseCase, ProcessPaymentCommand } from '../../../application/use-cases/process-payment.use-case';
+import { ProcessPaymentUseCase, ProcessPaymentCommand } from '../../application/use-cases/process-payment.use-case';
 
 export class ProcessPaymentDto {
   productId: string;
