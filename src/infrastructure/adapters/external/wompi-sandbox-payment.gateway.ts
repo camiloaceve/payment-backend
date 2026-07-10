@@ -57,10 +57,19 @@ export class WompiSandboxPaymentGateway implements PaymentGatewayPort {
       };
 
     } catch (error: any) {
-      console.error('[Wompi Sandbox] Error:', error.response?.data || error.message);
+      const errorData = error.response?.data;
+      console.error('[Wompi Sandbox] Error:', JSON.stringify(errorData, null, 2) || error.message);
+      
+      let errorMessage = error.message;
+      if (errorData?.error?.messages) {
+        errorMessage = JSON.stringify(errorData.error.messages);
+      } else if (errorData?.error?.reason) {
+        errorMessage = errorData.error.reason;
+      }
+      
       return {
         success: false,
-        error: error.response?.data?.error?.messages || error.message,
+        error: errorMessage,
       };
     }
   }
