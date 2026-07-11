@@ -41,6 +41,7 @@ describe('ProcessPaymentUseCase', () => {
 
   const validCommand = {
     productId: 'prod-1',
+    quantity: 1,
     amount: 150000,
     customerEmail: 'test@test.com',
     creditCardToken: 'tok_test_123',
@@ -59,14 +60,14 @@ describe('ProcessPaymentUseCase', () => {
     const product = new Product('prod-1', 'Test', 150000, 0);
     mockProductRepo.findById.mockResolvedValue(product);
 
-    await expect(useCase.execute(validCommand)).rejects.toThrow('Product is out of stock');
+    await expect(useCase.execute(validCommand)).rejects.toThrow('Product is out of stock for the requested quantity');
   });
 
-  it('should throw error if payment amount does not match product price', async () => {
+  it('should throw error if payment amount does not match product price * quantity', async () => {
     const product = new Product('prod-1', 'Test', 200000, 10);
     mockProductRepo.findById.mockResolvedValue(product);
 
-    await expect(useCase.execute(validCommand)).rejects.toThrow('Payment amount does not match product price');
+    await expect(useCase.execute(validCommand)).rejects.toThrow('Payment amount does not match product price * quantity');
   });
 
   it('should process successful payment, update transaction, decrease stock and log', async () => {

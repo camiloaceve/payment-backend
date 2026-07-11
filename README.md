@@ -2,7 +2,7 @@
 
 This is a robust Payment Backend API built with **NestJS**, following **Clean Code** principles, **Hexagonal Architecture** (Ports and Adapters), and **SOLID** principles.
 
-It integrates with the Wompi Payment Gateway (Sandbox UAT) to process payments and manages an inventory of products using TypeORM (MySQL).
+It integrates with the  Payment Gateway (Sandbox UAT) to process payments and manages an inventory of products using TypeORM (MySQL).
 
 ## 🚀 Technologies Used
 - Node.js (v20)
@@ -19,7 +19,7 @@ The project is strictly divided into 3 layers:
 2. **Application Layer (`src/application`):** Contains the Use Cases (`ProcessPaymentUseCase`, `GetProductsUseCase`). It orchestrates the domain models and ports.
 3. **Infrastructure Layer (`src/infrastructure`):** Contains the actual implementations (Adapters). 
    - `persistence`: MySQL TypeORM repositories.
-   - `external`: Wompi API HTTP adapter.
+   - `external`:  API HTTP adapter.
    - `controllers`: REST API endpoints and DTOs.
 
 ## 🛠️ Setup Instructions
@@ -39,9 +39,9 @@ DB_USER=root
 DB_PASSWORD=
 DB_NAME=payments_db
 
-WOMPI_API_URL=https://sandbox.wompi.co/v1
-WOMPI_PUBLIC_KEY=
-WOMPI_PRIVATE_KEY=
+_API_URL=https://sandbox..co/v1
+_PUBLIC_KEY=
+_PRIVATE_KEY=
 ```
 
 ### 3. Installation
@@ -102,4 +102,4 @@ Returns the list of available products with their current stock and prices.
   "installments": 1
 }
 ```
-Processes the payment via Wompi, updates stock, and registers the transaction log.
+Processes the payment via , updates stock, and registers the transaction log.

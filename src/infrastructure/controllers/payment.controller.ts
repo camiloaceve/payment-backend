@@ -12,6 +12,7 @@ export class PaymentController {
     try {
       const transaction = await this.processPaymentUseCase.execute({
         productId: dto.productId,
+        quantity: dto.quantity,
         amount: dto.amount,
         customerEmail: dto.customerEmail,
         creditCardToken: dto.creditCardToken,

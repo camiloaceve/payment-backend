@@ -28,12 +28,13 @@ export class ProcessPaymentUseCase {
       throw new Error('Product not found');
     }
 
-    if (!product.hasSufficientStock()) {
-      throw new Error('Product is out of stock');
+    if (!product.hasSufficientStock(command.quantity)) {
+      throw new Error('Product is out of stock for the requested quantity');
     }
 
-    if (product.price !== command.amount) {
-      throw new Error('Payment amount does not match product price');
+    const expectedAmount = product.price * command.quantity;
+    if (expectedAmount !== command.amount) {
+      throw new Error('Payment amount does not match product price * quantity');
     }
 
     // 2. Create Transaction in PENDING state
@@ -67,7 +68,7 @@ export class ProcessPaymentUseCase {
       // 4. Handle Gateway Response
       if (response.success) {
         transaction.markAsCompleted();
-        product.decreaseStock();
+        product.decreaseStock(command.quantity);
         await this.productRepository.save(product); // Update stock in DB
         await this.transactionLogRepository.save(
           new TransactionLog(uuidv4(), transactionId, TransactionStatus.COMPLETED, new Date(), 'Payment approved by Wompi')

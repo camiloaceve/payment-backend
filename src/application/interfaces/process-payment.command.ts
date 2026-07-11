@@ -1,5 +1,6 @@
 export interface ProcessPaymentCommand {
   productId: string;
+  quantity: number;
   amount: number;
   customerEmail: string;
   creditCardToken: string;

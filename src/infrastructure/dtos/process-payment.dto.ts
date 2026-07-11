@@ -7,6 +7,10 @@ export class ProcessPaymentDto {
 
   @IsNumber()
   @Min(1)
+  quantity: number;
+
+  @IsNumber()
+  @Min(1)
   amount: number;
 
   @IsEmail()
