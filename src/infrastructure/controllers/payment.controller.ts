@@ -16,6 +16,8 @@ export class PaymentController {
         customerEmail: dto.customerEmail,
         creditCardToken: dto.creditCardToken,
         installments: dto.installments,
+        customerData: dto.customerData,
+        billingData: dto.billingData,
       });
 
       return {

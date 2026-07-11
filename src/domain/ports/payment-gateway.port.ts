@@ -1,11 +1,11 @@
-export const PAYMENT_GATEWAY = 'PAYMENT_GATEWAY';
-
 export interface PaymentGatewayRequest {
-  reference: string;
   amount: number;
   customerEmail: string;
   creditCardToken: string;
   installments: number;
+  reference: string;
+  customerData: { phoneNumber: string; fullName: string };
+  billingData: { legalIdType: string; legalId: string };
 }
 
 export interface PaymentGatewayResponse {
@@ -13,6 +13,8 @@ export interface PaymentGatewayResponse {
   transactionId?: string;
   error?: string;
 }
+
+export const PAYMENT_GATEWAY = 'PAYMENT_GATEWAY';
 
 export interface PaymentGatewayPort {
   processPayment(request: PaymentGatewayRequest): Promise<PaymentGatewayResponse>;

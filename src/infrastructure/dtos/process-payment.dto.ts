@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsEmail, IsNotEmpty, Min } from 'class-validator';
+import { IsString, IsNumber, IsEmail, IsNotEmpty, Min, IsObject } from 'class-validator';
 
 export class ProcessPaymentDto {
   @IsString()
@@ -19,4 +19,10 @@ export class ProcessPaymentDto {
   @IsNumber()
   @Min(1)
   installments: number;
+
+  @IsObject()
+  customerData: { phoneNumber: string, fullName: string };
+
+  @IsObject()
+  billingData: { legalIdType: string, legalId: string };
 }

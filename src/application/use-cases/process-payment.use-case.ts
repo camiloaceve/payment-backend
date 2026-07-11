@@ -39,7 +39,6 @@ export class ProcessPaymentUseCase {
     // 2. Create Transaction in PENDING state
     const transactionId = uuidv4();
     const reference = `REF-${Date.now()}-${transactionId.substring(0, 8)}`;
-    
     const transaction = new Transaction(
       transactionId,
       reference,
@@ -56,14 +55,16 @@ export class ProcessPaymentUseCase {
     try {
       // 3. Call Wompi Payment API via Port
       const response = await this.paymentGateway.processPayment({
-        reference: transaction.reference,
-        amount: transaction.amount,
-        customerEmail: transaction.customerEmail,
+        amount: command.amount,
+        customerEmail: command.customerEmail,
         creditCardToken: command.creditCardToken,
         installments: command.installments,
+        reference: transaction.reference,
+        customerData: command.customerData,
+        billingData: command.billingData,
       });
 
-      // 4. Update transaction based on response and handle stock
+      // 4. Handle Gateway Response
       if (response.success) {
         transaction.markAsCompleted();
         product.decreaseStock();
@@ -88,7 +89,6 @@ export class ProcessPaymentUseCase {
 
     // Save final transaction state
     await this.transactionRepository.save(transaction);
-
     return transaction;
   }
 }

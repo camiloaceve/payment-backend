@@ -43,8 +43,10 @@ describe('ProcessPaymentUseCase', () => {
     productId: 'prod-1',
     amount: 150000,
     customerEmail: 'test@test.com',
-    creditCardToken: 'tok_123',
+    creditCardToken: 'tok_test_123',
     installments: 1,
+    customerData: { phoneNumber: '+573001234567', fullName: 'John Doe' },
+    billingData: { legalIdType: 'CC', legalId: '123456' }
   };
 
   it('should throw error if product not found', async () => {
@@ -78,18 +80,11 @@ describe('ProcessPaymentUseCase', () => {
 
     const result = await useCase.execute(validCommand);
 
-    // Verify transaction object returned
     expect(result.status).toBe(TransactionStatus.COMPLETED);
     expect(result.amount).toBe(150000);
-    
-    // Verify product stock decreased
     expect(product.stock).toBe(9);
     expect(mockProductRepo.save).toHaveBeenCalledWith(product);
-
-    // Verify transaction saves (PENDING and COMPLETED)
     expect(mockTransactionRepo.save).toHaveBeenCalledTimes(2);
-
-    // Verify logs
     expect(mockTransactionLogRepo.save).toHaveBeenCalledTimes(2);
   });
 
@@ -105,7 +100,7 @@ describe('ProcessPaymentUseCase', () => {
     const result = await useCase.execute(validCommand);
 
     expect(result.status).toBe(TransactionStatus.FAILED);
-    expect(product.stock).toBe(10); // Stock should not change
+    expect(product.stock).toBe(10); 
     expect(mockProductRepo.save).not.toHaveBeenCalled();
     expect(mockTransactionRepo.save).toHaveBeenCalledTimes(2);
   });
