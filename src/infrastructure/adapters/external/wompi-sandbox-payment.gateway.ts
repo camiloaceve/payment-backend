@@ -48,8 +48,14 @@ export class WompiSandboxPaymentGateway implements PaymentGatewayPort {
         session_id: `session_${Date.now()}`,
         merchant_user_id: `user_${request.customerEmail}`,
         customer_number_prefix: '+57',
-        customer_data: request.customerData,
-        billing_data: request.billingData,
+        customer_data: {
+          phone_number: request.customerData.phoneNumber,
+          full_name: request.customerData.fullName,
+        },
+        billing_data: {
+          legal_id_type: request.billingData.legalIdType,
+          legal_id: request.billingData.legalId,
+        },
         signature: null,
       };
 
