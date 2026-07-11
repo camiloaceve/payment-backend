@@ -85,6 +85,21 @@ docker build -t payment-backend .
 docker run -p 3000:3000 --env-file .env payment-backend
 ```
 
+## ☁️ Serverless Deployment (AWS Lambda)
+This application is fully adapted to run as a serverless function on AWS Lambda using the Serverless Framework.
+
+### Prerequisites
+- AWS CLI configured locally (`aws configure`) with an appropriate profile (e.g., `sandbox`).
+- Serverless Framework v3 installed (`npm install -g serverless@3`).
+
+### Deployment Steps
+1. Make sure your database and API keys in `serverless.yaml` are pointing to a public or accessible resource (like AWS RDS).
+2. Run the deployment script:
+```bash
+npm run deploy
+```
+This will compile the TypeScript code and deploy the infrastructure to AWS using the `serverless.yaml` configuration. The final URL of the API Gateway will be printed in the console.
+
 ## 📝 Endpoints
 
 ### 1. Get Products
