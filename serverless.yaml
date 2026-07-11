@@ -2,23 +2,28 @@ service: payment-backend
 
 provider:
   name: aws
-  runtime: nodejs20.x
-  region: us-east-1 # Puedes cambiarla a la región que prefieras
+  profile: sandbox
+  runtime: nodejs24.x
+  region: us-east-2 # Puedes cambiarla a la región que prefieras
   memorySize: 512 # NestJS necesita un poco más de memoria para arrancar rápido
   timeout: 30 # Segundos máximos por petición
   environment:
     # IMPORTANTE: Aquí debes poner las variables de entorno para que NestJS se conecte a tu base de datos
     # Si la dejas en localhost, Lambda fallará. Debe ser una URL accesible públicamente o dentro de tu VPC.
-    DB_HOST: ${env:DB_HOST, 'localhost'}
+    DB_HOST: ${env:DB_HOST, 'database-mysql.cluster-cbkgw60gqsu5.us-east-2.rds.amazonaws.com'}
     DB_PORT: ${env:DB_PORT, '3306'}
-    DB_USER: ${env:DB_USER, 'root'}
-    DB_PASSWORD: ${env:DB_PASSWORD, 'root'}
-    DB_NAME: ${env:DB_NAME, 'payment_db'}
+    DB_USER: ${env:DB_USER, 'admin'}
+    DB_PASSWORD: ${env:DB_PASSWORD, 'w94FbLTbDGSIzj'}
+    DB_NAME: ${env:DB_NAME, 'wompi_test'}
     PORT: 3000
+    WOMPI_API_URL: ${env:WOMPI_API_URL, 'https://sandbox.wompi.co/v1'}
+    WOMPI_PUBLIC_KEY: ${env:WOMPI_PUBLIC_KEY, 'pub_test_Q5yDA9xoKdePzhSGeVe9HAez7HgGORGf'}
+    WOMPI_PRIVATE_KEY: ${env:WOMPI_PRIVATE_KEY, 'prv_stagtest_5i0ZGIGiFcDQifYsXxvsny7Y37tKqFWg'}
+
 
 functions:
   api:
-    handler: dist/main.serverless.handler
+    handler: dist/lambda.handler
     events:
       - http:
           method: any
