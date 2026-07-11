@@ -1,0 +1,30 @@
+service: payment-backend
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1 # Puedes cambiarla a la región que prefieras
+  memorySize: 512 # NestJS necesita un poco más de memoria para arrancar rápido
+  timeout: 30 # Segundos máximos por petición
+  environment:
+    # IMPORTANTE: Aquí debes poner las variables de entorno para que NestJS se conecte a tu base de datos
+    # Si la dejas en localhost, Lambda fallará. Debe ser una URL accesible públicamente o dentro de tu VPC.
+    DB_HOST: ${env:DB_HOST, 'localhost'}
+    DB_PORT: ${env:DB_PORT, '3306'}
+    DB_USER: ${env:DB_USER, 'root'}
+    DB_PASSWORD: ${env:DB_PASSWORD, 'root'}
+    DB_NAME: ${env:DB_NAME, 'payment_db'}
+    PORT: 3000
+
+functions:
+  api:
+    handler: dist/main.serverless.handler
+    events:
+      - http:
+          method: any
+          path: /{proxy+}
+          cors: true
+      - http:
+          method: any
+          path: /
+          cors: true
